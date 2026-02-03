@@ -1,4 +1,4 @@
-Use a multi-stage build with bun for installs and node for runtime
+# Use a multi-stage build with bun for installs and node for runtime
 FROM oven/bun:1.1.34-alpine AS deps
 WORKDIR /app
 RUN apk add --no-cache python3 make g++
