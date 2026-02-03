@@ -1,4 +1,4 @@
-# Use a multi-stage build with bun for installs and node for runtime
+Use a multi-stage build with bun for installs and node for runtime
 FROM oven/bun:1.1.34-alpine AS deps
 WORKDIR /app
 RUN apk add --no-cache python3 make g++
@@ -18,11 +18,17 @@ RUN bun run build
 FROM node:20-alpine AS runtime
 WORKDIR /app
 
+RUN apk add --no-cache curl bash \
+    && curl -fsSL https://bun.sh/install | bash
+ENV PATH="/root/.bun/bin:${PATH}"
+
 # Copy production dependencies and built application
 COPY --from=deps /app/node_modules ./node_modules
 COPY --from=build /app/dist ./dist
-COPY package.json ./
-
+COPY package.json drizzle.config.ts ./
+COPY ./src ./src
+COPY . .
+RUN bun install --no-save --frozen-lockfile
 # Expose port
 EXPOSE 3000
 
